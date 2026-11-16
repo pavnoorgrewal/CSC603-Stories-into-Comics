@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>Draw Me a Story — Story to comic studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--paper:#f7f5ef;--ink:#20241f;--muted:#777a71;--line:#e5e2d9;--orange:#f36e43;--green:#dce9c7;--white:#fffefa;--shadow:0 12px 34px #28251b12}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif}button,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
+    .shell{max-width:1440px;min-height:100vh;margin:auto;display:grid;grid-template-columns:244px 1fr;background:var(--paper)}
+    aside{border-right:1px solid var(--line);padding:28px 18px;display:flex;flex-direction:column;min-height:100vh}
+    .brand{display:flex;align-items:center;gap:11px;padding:0 10px 34px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.5px}
+    .brand-mark{width:34px;height:34px;background:var(--orange);border:1.5px solid var(--ink);border-radius:11px;display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink);font-size:19px}
+    .side-label{font:10px 'DM Mono',monospace;letter-spacing:.13em;color:#a09d91;padding:0 12px 10px;text-transform:uppercase}
+    .nav{display:grid;gap:5px}.nav-item{border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:12px;font-size:13px;color:#686b62}.nav-item.active{background:#edeae1;color:var(--ink);font-weight:700}.nav-item .icon{font-size:17px;width:20px;text-align:center}
+    .side-bottom{margin-top:auto}.pro-card{border:1px solid #e9d0be;border-radius:14px;padding:15px;background:#fff8f0;margin:20px 2px}.pro-card strong{font:600 13px 'Space Grotesk'}.pro-card p{font-size:11px;line-height:1.5;color:#797368;margin:6px 0 12px}.pro-card button{background:var(--ink);color:white;border:0;border-radius:8px;padding:9px 11px;font-size:11px;font-weight:700;width:100%}.profile{display:flex;gap:10px;align-items:center;border-top:1px solid var(--line);padding:18px 8px 0}.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#dce9c7;font-weight:700;font-size:12px}.profile b{font-size:12px}.profile small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+    main{padding:0 44px 60px;min-width:0}.topbar{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.crumb{font-size:12px;color:var(--muted)}.crumb b{color:var(--ink)}.top-actions{display:flex;align-items:center;gap:16px}.help{width:27px;height:27px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-size:12px;color:var(--muted)}.save-status{font:10px 'DM Mono',monospace;color:#8d8f84;letter-spacing:.05em}.save-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#77a66b;margin-right:6px}
+    .content{max-width:1040px;margin:0 auto}.hero{padding:42px 0 25px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px}.eyebrow{font:10px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.14em;color:var(--orange);display:flex;gap:8px;align-items:center}.eyebrow:before{content:'';height:1px;width:20px;background:var(--orange)}h1{font:600 clamp(34px,4.2vw,52px)/1.04 'Space Grotesk',sans-serif;letter-spacing:-2.4px;margin:12px 0 10px}.hero p{margin:0;color:var(--muted);font-size:14px}.steps{display:flex;gap:7px;margin-bottom:4px}.step{font:10px 'DM Mono',monospace;border:1px solid var(--line);padding:8px 11px;border-radius:99px;color:#99998f}.step.active{border-color:var(--ink);background:var(--ink);color:white}
+    .workspace{display:grid;grid-template-columns:minmax(300px,.88fr) minmax(390px,1.12fr);gap:18px;align-items:stretch}.card{background:var(--white);border:1px solid #e8e5dc;border-radius:16px;box-shadow:var(--shadow)}.input-card{padding:22px;display:flex;flex-direction:column}.card-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.card-heading h2{font:600 16px 'Space Grotesk';letter-spacing:-.3px;margin:0}.mini-tag{font:9px 'DM Mono',monospace;color:#8d8c82;background:#f3f1eb;padding:6px 8px;border-radius:6px}.label{display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:8px}.label small{font:10px 'DM Mono',monospace;color:#aaa79c;font-weight:400}.story-input{resize:vertical;min-height:220px;border:1px solid #e7e4da;background:#fbfaf6;border-radius:10px;padding:14px;font-size:12px;line-height:1.75;color:#4f514a;outline:none;transition:.2s}.story-input:focus{border-color:#b5b9a9;box-shadow:0 0 0 3px #e7ebdf}.under-input{display:flex;justify-content:space-between;margin:8px 1px 20px;font:9px 'DM Mono',monospace;color:#aaa79c}.control-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.control label{display:block;font-size:10px;color:#787a70;margin-bottom:7px}.select{width:100%;background:#fbfaf6;border:1px solid #e7e4da;border-radius:8px;padding:10px;font-size:11px;color:#44473f}.generate{margin-top:auto;padding-top:22px}.primary{width:100%;border:1px solid var(--ink);background:var(--orange);color:white;border-radius:10px;padding:13px 16px;font-weight:700;font-size:12px;box-shadow:3px 3px 0 var(--ink);transition:transform .15s,box-shadow .15s}.primary:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}.primary span{font-size:17px;vertical-align:-2px;margin-right:7px}.privacy{text-align:center;color:#a2a095;font-size:9px;margin:11px 0 0}
+    .preview-card{padding:22px;display:flex;flex-direction:column;min-width:0}.preview-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:15px}.preview-head h2{font:600 16px 'Space Grotesk';letter-spacing:-.3px;margin:0 0 4px}.preview-head p{margin:0;color:#98978e;font-size:10px}.badge{display:flex;gap:6px;align-items:center;border:1px solid #d9e5cf;background:#f1f6e9;padding:7px 9px;border-radius:99px;color:#668052;font:9px 'DM Mono',monospace}.badge i{width:5px;height:5px;background:#80a56a;border-radius:50%}.canvas{background:#f0eee7;border:1px solid #e8e5dc;border-radius:11px;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:1}.panel{position:relative;background:white;border:1.5px solid #282a25;border-radius:5px;overflow:hidden;min-height:155px;box-shadow:2px 2px 0 #282a25}.art{width:100%;height:100%;min-height:155px;display:block}.panel-num{position:absolute;left:8px;top:8px;background:#fffefaee;border:1px solid #242620;border-radius:4px;padding:4px 6px;font:8px 'DM Mono',monospace}.panel-caption{position:absolute;bottom:8px;left:8px;right:8px;text-align:center;background:#fffdf1ed;border:1px solid #292a26;border-radius:99px;padding:6px 7px;font:600 8px 'DM Sans',sans-serif;color:#383b32;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .preview-foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px}.character-chip{display:flex;align-items:center;gap:8px;color:#77796f;font-size:10px}.fox{width:24px;height:24px;border-radius:8px;background:#ffdfc7;display:grid;place-items:center;font-size:15px}.preview-actions{display:flex;gap:7px}.ghost{border:1px solid var(--line);background:white;border-radius:7px;padding:8px 10px;color:#5e6058;font-size:10px}.ghost:hover{background:#f6f4ee}.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,20px);background:#20241f;color:white;padding:12px 18px;border-radius:10px;font-size:12px;opacity:0;transition:.25s;pointer-events:none;box-shadow:var(--shadow)}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:1000px){.shell{grid-template-columns:205px 1fr}aside{padding:24px 12px}main{padding:0 25px 45px}.workspace{grid-template-columns:1fr}.input-card{min-height:450px}.preview-card{min-height:480px}}
+    @media(max-width:680px){.shell{display:block}aside{display:none}main{padding:0 16px 35px}.topbar{height:60px}.hero{padding:30px 0 20px;display:block}.steps{margin-top:18px}.workspace{display:flex;flex-direction:column}.input-card{min-height:0;padding:17px}.preview-card{padding:17px;min-height:450px}.story-input{min-height:165px}.canvas{gap:7px;padding:7px}.panel,.art{min-height:130px}.preview-foot{gap:8px}.ghost{padding:7px}.save-status{font-size:8px}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside>
+    <a class="brand" href="#"><span class="brand-mark">✳</span> Draw Me a Story</a>
+    <div class="side-label">Workspace</div>
+    <nav class="nav">
+      <button class="nav-item active"><span class="icon">✦</span> Create a comic</button>
+      <button class="nav-item" id="libraryNav"><span class="icon">▤</span> My stories</button>
+      <button class="nav-item" id="inspireNav"><span class="icon">◉</span> Inspiration</button>
+    </nav>
+    <div class="side-bottom">
+      <div class="pro-card"><strong>Your imagination, illustrated.</strong><p>Turn a few lines into a whole new world.</p><button id="learnMore">How it works ↗</button></div>
+      <div class="profile"><div class="avatar">PG</div><div><b>Story maker</b><small>Free workspace</small></div></div>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="crumb">Workspace&nbsp; / &nbsp;<b>Create a comic</b></div><div class="top-actions"><span class="save-status"><i class="save-dot"></i>ALL CHANGES SAVED</span><span class="help">?</span></div></header>
+    <div class="content">
+      <section class="hero"><div><div class="eyebrow">Your story studio</div><h1>Make a comic<br>out of anything.</h1><p>Start with a story. Leave with a little bit of magic.</p></div><div class="steps"><span class="step active">01 &nbsp;Story</span><span class="step">02 &nbsp;Panels</span><span class="step">03 &nbsp;Your comic</span></div></section>
+      <section class="workspace">
+        <div class="card input-card">
+          <div class="card-heading"><h2>Tell us what happens</h2><span class="mini-tag">YOUR STORY</span></div>
+          <div class="label"><span>Story prompt</span><small>Keep it short & sweet</small></div>
+          <textarea id="story" class="story-input" maxlength="1000" placeholder="A curious little fox found a tiny door hidden beneath the roots of an old apple tree…">Milo the fox found a tiny door beneath the old apple tree. He knocked three times, and a warm golden light spilled out. Inside, a shy moon rabbit was looking for a friend to share the night sky with.</textarea>
+          <div class="under-input"><span>✧ &nbsp;A beginning, a middle, a little surprise</span><span id="counter">0 / 1,000</span></div>
+          <div class="control-row">
+            <div class="control"><label for="panels">Number of panels</label><select class="select" id="panels"><option>4 panels</option><option>3 panels</option><option>5 panels</option><option>6 panels</option></select></div>
+            <div class="control"><label for="style">Illustration style</label><select class="select" id="style"><option>Storybook color</option><option>Bold & graphic</option><option>Soft watercolor</option><option>Playful doodles</option></select></div>
+          </div>
+          <div class="generate"><button class="primary" id="generate"><span>✦</span> Make my comic</button><p class="privacy">Your story stays yours. Make something lovely.</p></div>
+        </div>
+        <div class="card preview-card">
+          <div class="preview-head"><div><h2>A little preview</h2><p>Your story is taking shape</p></div><span class="badge"><i></i> READY TO CREATE</span></div>
+          <div class="canvas" id="canvas">
+            <div class="panel"><svg class="art" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice"><rect width="320" height="220" fill="#dce9c7"/><circle cx="256" cy="43" r="25" fill="#fff3c4"/><path d="M0 150 Q70 120 130 150 T320 139 V220 H0Z" fill="#a7c38c"/><path d="M80 0 Q72 54 81 100 Q92 141 73 193 M122 0 Q105 49 116 94" fill="none" stroke="#76573c" stroke-width="19"/><path d="M28 133 Q40 82 87 90 Q133 92 143 139Z" fill="#77965e"/><ellipse cx="198" cy="159" rx="34" ry="36" fill="#db8a4f"/><path d="M171 139 L171 113 L192 131 M205 131 L225 109 L222 144" fill="#db8a4f" stroke="#bd7042" stroke-width="4"/><ellipse cx="210" cy="155" rx="18" ry="14" fill="#f7d4b5"/><circle cx="213" cy="151" r="3"/><circle cx="200" cy="145" r="3"/><path d="M227 175 Q252 186 246 159" fill="none" stroke="#bd7042" stroke-width="7" stroke-linecap="round"/></svg><span class="panel-num">PANEL 01</span><span class="panel-caption">A secret beneath the tree…</span></div>
+            <div class="panel"><svg class="art" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice"><rect width="320" height="220" fill="#f6d69d"/><rect y="149" width="320" height="71" fill="#c99d68"/><path d="M0 125 Q63 96 121 126 T240 112 T320 120 V160 H0Z" fill="#91a878"/><rect x="131" y="80" width="88" height="82" rx="3" fill="#724f36"/><rect x="140" y="88" width="70" height="73" fill="#ffce70"/><path d="M126 83 L175 45 L224 83Z" fill="#80593c"/><path d="M150 160 V118 Q175 93 200 118 V160Z" fill="#f2a23f"/><circle cx="193" cy="133" r="3" fill="#473728"/><path d="M52 162 Q50 134 80 134 Q106 135 108 164Z" fill="#db8a4f"/><circle cx="97" cy="145" r="4" fill="#473728"/></svg><span class="panel-num">PANEL 02</span><span class="panel-caption">A golden glow inside</span></div>
+            <div class="panel"><svg class="art" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice"><rect width="320" height="220" fill="#b8c8e8"/><circle cx="266" cy="42" r="30" fill="#fff1bd"/><circle cx="56" cy="40" r="2" fill="white"/><circle cx="130" cy="35" r="3" fill="white"/><circle cx="207" cy="78" r="2" fill="white"/><path d="M0 165 Q72 131 140 160 T320 151 V220 H0Z" fill="#677e9f"/><ellipse cx="120" cy="165" rx="36" ry="31" fill="#db8a4f"/><path d="M91 146 L86 116 L112 137 M132 137 L153 113 L146 150" fill="#db8a4f"/><ellipse cx="228" cy="152" rx="28" ry="37" fill="#eee8df"/><ellipse cx="209" cy="126" rx="12" ry="34" transform="rotate(-14 209 126)" fill="#eee8df"/><ellipse cx="242" cy="122" rx="12" ry="34" transform="rotate(12 242 122)" fill="#eee8df"/><circle cx="224" cy="150" r="3"/><circle cx="236" cy="150" r="3"/></svg><span class="panel-num">PANEL 03</span><span class="panel-caption">A friend from the moon</span></div>
+            <div class="panel"><svg class="art" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice"><rect width="320" height="220" fill="#34466e"/><circle cx="255" cy="46" r="27" fill="#ffe8a3"/><circle cx="49" cy="53" r="2" fill="white"/><circle cx="122" cy="38" r="3" fill="white"/><circle cx="205" cy="83" r="2" fill="white"/><path d="M0 168 Q90 139 160 166 T320 156 V220 H0Z" fill="#435d53"/><ellipse cx="111" cy="161" rx="30" ry="30" fill="#db8a4f"/><path d="M91 143 L90 117 L111 134 M122 133 L141 111 L136 148" fill="#db8a4f"/><ellipse cx="202" cy="157" rx="27" ry="33" fill="#eee8df"/><path d="M178 126 Q146 91 173 109" fill="none" stroke="#eee8df" stroke-width="14"/><path d="M226 125 Q258 91 232 109" fill="none" stroke="#eee8df" stroke-width="14"/><path d="M131 126 Q152 107 168 126" fill="#fff0c8"/><path d="M167 128 Q153 150 137 138" fill="none" stroke="#fff0c8" stroke-width="4"/></svg><span class="panel-num">PANEL 04</span><span class="panel-caption">Two friends, one big sky</span></div>
+          </div>
+          <div class="preview-foot"><div class="character-chip"><span class="fox">🦊</span><span>Meet your main character: <b>Milo</b></span></div><div class="preview-actions"><button class="ghost" id="refresh">↻ &nbsp;Try again</button><button class="ghost" id="download">↓ &nbsp;Download</button></div></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast">This is a design preview — comic generation is not connected yet.</div>
+<script>
+  const story=document.querySelector('#story'), counter=document.querySelector('#counter'), toast=document.querySelector('#toast');
+  const update=()=>counter.textContent=`${story.value.length.toLocaleString()} / 1,000`;
+  story.addEventListener('input',update);update();
+  let timer;function message(text){toast.textContent=text;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>toast.classList.remove('show'),2600)}
+  document.querySelector('#generate').addEventListener('click',()=>message('Lovely start! AI comic generation will be connected in the next step.'));
+  document.querySelector('#refresh').addEventListener('click',()=>message('Your preview is ready for a fresh take.'));
+  document.querySelector('#download').addEventListener('click',()=>message('Downloads will be available once comic creation is connected.'));
+  document.querySelector('#learnMore').addEventListener('click',()=>message('Write a story, choose a style, and watch it become a comic.'));
+  document.querySelector('#libraryNav').addEventListener('click',()=>message('Your story library is coming soon.'));
+  document.querySelector('#inspireNav').addEventListener('click',()=>message('Story prompts are coming soon.'));
+</script>
+</body>
+</html>
