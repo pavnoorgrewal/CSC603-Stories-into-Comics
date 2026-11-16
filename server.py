@@ -14,6 +14,14 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parent
 
 
+class GeminiError(RuntimeError):
+    """A failed Gemini call. status is the HTTP status code when there was one."""
+
+    def __init__(self, message, status=None):
+        super().__init__(message)
+        self.status = status
+
+
 def load_local_env():
     path = ROOT / ".env"
     if path.exists():
@@ -40,9 +48,9 @@ def gemini_request(model, payload):
             detail = json.load(error).get("error", {}).get("message", "")
         except (ValueError, OSError):
             detail = ""
-        raise RuntimeError(f"Gemini returned HTTP {error.code}: {detail[:220]}") from error
+        raise GeminiError(f"Gemini returned HTTP {error.code}: {detail[:220]}", status=error.code) from error
     except URLError as error:
-        raise RuntimeError("Could not reach Gemini. Check the internet connection.") from error
+        raise GeminiError("Could not reach Gemini. Check the internet connection.") from error
 
 
 def first_part(response, kind):
@@ -133,7 +141,73 @@ def request_plan(story, count, style):
     response = gemini_request(os.environ.get("GEMINI_TEXT_MODEL", "gemini-3.5-flash"), {
         "contents": [{"parts": [{"text": plan_prompt(story, count, style)}]}],
         "generationConfig": {"responseMimeType": "application/json", "responseSchema": PLAN_SCHEMA}})
-    return normalize_plan(json.loads(first_part(response, "text")))
+    try:
+        return normalize_plan(json.loads(first_part(response, "text")))
+    except ValueError:  # not valid JSON; validate_plan will reject the empty plan
+        return normalize_plan({})
+
+
+ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]{0,29}$")
+LIMITS = {"title": 120, "name": 60, "appearance": 400, "setting": 200, "mood": 60,
+          "scene": 600, "caption": 200, "dialogue": 160}
+MAX_DIALOGUE_LINES = 2
+
+
+def validate_plan(plan, count):
+    """Return a list of problems with a normalized plan. An empty list means it is valid."""
+    problems = []
+
+    def check_length(label, value, limit):
+        if len(value) > limit:
+            problems.append(f"{label} is longer than {limit} characters")
+
+    check_length("title", plan["title"], LIMITS["title"])
+    ids = [c["id"] for c in plan["characters"]]
+    if len(ids) != len(set(ids)):
+        problems.append("character ids are not unique")
+    for c in plan["characters"]:
+        if not ID_PATTERN.match(c["id"]):
+            problems.append(f"character id {c['id']!r} is not a short lowercase id")
+        if not c["name"]:
+            problems.append(f"character {c['id']!r} has no name")
+        check_length(f"name of {c['id']!r}", c["name"], LIMITS["name"])
+        check_length(f"appearance of {c['id']!r}", c["appearance"], LIMITS["appearance"])
+    known = set(ids)
+
+    panels = plan["panels"]
+    if len(panels) != count:
+        problems.append(f"expected {count} panels but got {len(panels)}")
+    for index, panel in enumerate(panels, start=1):
+        where = f"panel {index}"
+        if panel["panel_number"] != index:
+            problems.append(f"{where} is numbered {panel['panel_number']!r}")
+        if not panel["scene"]:
+            problems.append(f"{where} has an empty scene")
+        for field in ("setting", "mood", "scene", "caption"):
+            check_length(f"{where} {field}", panel[field], LIMITS[field])
+        present = set(panel["character_ids"])
+        for cid in present - known:
+            problems.append(f"{where} uses unknown character {cid!r}")
+        if len(panel["dialogue"]) > MAX_DIALOGUE_LINES:
+            problems.append(f"{where} has more than {MAX_DIALOGUE_LINES} dialogue lines")
+        for line in panel["dialogue"]:
+            if line["speaker_id"] not in present:
+                problems.append(f"{where} speaker {line['speaker_id']!r} is not in the panel")
+            if not line["text"]:
+                problems.append(f"{where} has an empty dialogue line")
+            check_length(f"{where} dialogue", line["text"], LIMITS["dialogue"])
+    return problems
+
+
+def plan_with_retry(story, count, style):
+    """Ask Gemini for a plan; if it fails validation, ask once more before giving up."""
+    for attempt in range(2):
+        plan = request_plan(story, count, style)
+        problems = validate_plan(plan, count)
+        if not problems:
+            return plan
+    raise GeminiError("Gemini's story plan did not pass our checks twice "
+                      f"({'; '.join(problems[:3])}). Please try again or simplify the story.")
 
 
 def image_prompt(plan, panel, style):
@@ -151,11 +225,9 @@ def image_prompt(plan, panel, style):
 
 
 def make_comic(story, count, style):
-    plan = request_plan(story, count, style)
+    plan = plan_with_retry(story, count, style)
     panels = plan["panels"]
-    if len(panels) != count:
-        raise RuntimeError("Gemini returned the wrong number of panels. Please try again.")
-    warning = None
+    warning, made = None, 0
     for panel in panels:
         try:
             picture = gemini_request(os.environ.get("GEMINI_IMAGE_MODEL", "gemini-3.1-flash-image"), {
@@ -165,11 +237,14 @@ def make_comic(story, count, style):
             data = inline["data"]
             base64.b64decode(data, validate=True)
             panel["image"] = f"data:{inline.get('mimeType', 'image/png')};base64,{data}"
+            made += 1
         except (RuntimeError, ValueError, KeyError) as error:
-            warning = str(error)
-            break
-    return {**plan, "main_character": plan["main_character"] or "Your character",
-            "mode": "gemini-text-only" if warning else "gemini", "warning": warning}
+            if getattr(error, "status", None) == 429:
+                warning = "Gemini image quota is used up for this key, so panels without images show scene cards."
+                break  # quota exhausted: further image requests would fail too
+            warning = f"Panel {panel['panel_number']} image failed: {error}"
+    mode = "gemini" if made == len(panels) else "gemini-partial" if made else "gemini-text-only"
+    return {**plan, "main_character": plan["main_character"] or "Your character", "mode": mode, "warning": warning}
 
 
 def local_preview(story, count):

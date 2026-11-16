@@ -100,11 +100,11 @@
       lastPanels=data.panels;const cards=[...canvas.querySelectorAll('.panel')];
       data.panels.forEach((panel,i)=>{let card=cards[i];if(!card){card=cards[0].cloneNode(true);canvas.appendChild(card)}card.querySelector('.panel-num').textContent=`PANEL ${String(i+1).padStart(2,'0')}`;card.querySelector('.panel-caption').textContent=panel.caption||'A new story moment';if(panel.image){const img=document.createElement('img');img.className='art';img.alt=panel.scene||'Comic panel';img.src=panel.image;card.querySelector('.art').replaceWith(img)}});
       cards.slice(data.panels.length).forEach(card=>card.remove());
-      badge.innerHTML=data.mode==='gemini'?'<i></i> GEMINI COMIC READY':data.mode==='gemini-text-only'?'<i></i> STORY READY · IMAGE UNAVAILABLE':'<i></i> LOCAL STORY PREVIEW';
+      badge.innerHTML=data.mode==='gemini'?'<i></i> GEMINI COMIC READY':data.mode==='gemini-partial'?'<i></i> COMIC READY · SOME IMAGES MISSING':data.mode==='gemini-text-only'?'<i></i> STORY READY · IMAGE UNAVAILABLE':'<i></i> LOCAL STORY PREVIEW';
       document.querySelector('.preview-head p').textContent='Your story is arranged into panels';
       document.querySelector('.character-chip').innerHTML='<span class="fox">✦</span><span>Main character: <b></b></span>';document.querySelector('.character-chip b').textContent=data.main_character||'Your character';
       localStorage.setItem('draw-me-story-current',JSON.stringify({story:story.value,count:document.querySelector('#panels').value,style:document.querySelector('#style').value}));
-      document.querySelector('.save-status').innerHTML='<i class="save-dot"></i>STORY SAVED';message(data.warning?'Story panels are ready. Gemini image generation is unavailable for this key right now.':'Your story is now laid out in panels.');
+      document.querySelector('.save-status').innerHTML='<i class="save-dot"></i>STORY SAVED';message(data.warning?`Story panels are ready. ${data.warning}`:'Your story is now laid out in panels.');
     }catch(error){message(error.message)}finally{button.disabled=false;button.innerHTML='<span>✦</span> Make my comic';loading.classList.remove('show')}
   }
   document.querySelector('#generate').addEventListener('click',makeComic);
