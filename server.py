@@ -224,9 +224,17 @@ def image_prompt(plan, panel, style):
     )
 
 
+def images_enabled():
+    """GEMINI_IMAGES=off (or false/0/no) skips image requests, e.g. on the free tier with no image quota."""
+    return os.environ.get("GEMINI_IMAGES", "on").strip().lower() not in ("off", "false", "0", "no")
+
+
 def make_comic(story, count, style):
     plan = plan_with_retry(story, count, style)
     panels = plan["panels"]
+    if not images_enabled():
+        return {**plan, "main_character": plan["main_character"] or "Your character",
+                "mode": "gemini-text-only", "warning": None}
     warning, made = None, 0
     for panel in panels:
         try:

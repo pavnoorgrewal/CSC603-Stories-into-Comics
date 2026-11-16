@@ -229,6 +229,26 @@ class MakeComicTests(unittest.TestCase):
         self.assertTrue(all("image" not in p for p in result["panels"]))
         self.assertIn("quota", result["warning"])
 
+    def test_images_off_skips_image_requests(self):
+        for value in ("off", "OFF", "false", "0", "no"):
+            with self.subTest(value=value), mock.patch.dict(os.environ, {"GEMINI_IMAGES": value}):
+                fake = FakeGemini([good_plan()])
+                result = self.run_comic(fake)
+                self.assertEqual(fake.image_calls, [])
+                self.assertEqual(result["mode"], "gemini-text-only")
+                self.assertIsNone(result["warning"])
+                self.assertEqual(len(result["panels"]), 3)
+
+    def test_images_on_by_default_and_when_set(self):
+        for value in (None, "on"):
+            with self.subTest(value=value), mock.patch.dict(os.environ):
+                os.environ.pop("GEMINI_IMAGES", None)
+                if value:
+                    os.environ["GEMINI_IMAGES"] = value
+                fake = FakeGemini([good_plan()])
+                self.assertEqual(self.run_comic(fake)["mode"], "gemini")
+                self.assertEqual(len(fake.image_calls), 3)
+
     def test_missing_image_data_is_skipped(self):
         fake = FakeGemini([good_plan()], [text_response("no picture")])
         result = self.run_comic(fake)
