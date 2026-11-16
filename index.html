@@ -45,6 +45,11 @@
     .bubble b{display:block;font:500 9px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--orange)}
     .bubble:after{content:'';position:absolute;left:12px;bottom:-6px;width:8px;height:8px;background:#fffefa;border-right:1.5px solid #282a25;border-bottom:1.5px solid #282a25;transform:rotate(45deg)}.bubble:nth-child(even):after{left:auto;right:12px}
     @media(max-width:680px){.scene-card{min-height:130px}}
+    .preview-foot{flex-wrap:wrap;gap:8px}.preview-actions{flex-wrap:wrap}
+    .library{border:1px solid #e8e5dc;padding:22px;width:min(460px,calc(100vw - 32px));color:var(--ink)}.library::backdrop{background:#20241f55}
+    .library ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}.library .empty{color:var(--muted);font-size:13px;margin:0}
+    .story-item{width:100%;text-align:left;border:1px solid var(--line);background:#fbfaf6;border-radius:10px;padding:11px 12px;color:var(--ink)}.story-item:hover{background:#f3f1eb}
+    .story-item b{display:block;font:600 14px 'Space Grotesk',sans-serif;margin-bottom:3px}.story-item small{font:11px 'DM Mono',monospace;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -86,18 +91,19 @@
             <div class="panel"><svg class="art" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice"><rect width="320" height="220" fill="#b8c8e8"/><circle cx="266" cy="42" r="30" fill="#fff1bd"/><circle cx="56" cy="40" r="2" fill="white"/><circle cx="130" cy="35" r="3" fill="white"/><circle cx="207" cy="78" r="2" fill="white"/><path d="M0 165 Q72 131 140 160 T320 151 V220 H0Z" fill="#677e9f"/><ellipse cx="120" cy="165" rx="36" ry="31" fill="#db8a4f"/><path d="M91 146 L86 116 L112 137 M132 137 L153 113 L146 150" fill="#db8a4f"/><ellipse cx="228" cy="152" rx="28" ry="37" fill="#eee8df"/><ellipse cx="209" cy="126" rx="12" ry="34" transform="rotate(-14 209 126)" fill="#eee8df"/><ellipse cx="242" cy="122" rx="12" ry="34" transform="rotate(12 242 122)" fill="#eee8df"/><circle cx="224" cy="150" r="3"/><circle cx="236" cy="150" r="3"/></svg><span class="panel-num">PANEL 03</span><span class="panel-caption">A friend from the moon</span></div>
             <div class="panel"><svg class="art" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice"><rect width="320" height="220" fill="#34466e"/><circle cx="255" cy="46" r="27" fill="#ffe8a3"/><circle cx="49" cy="53" r="2" fill="white"/><circle cx="122" cy="38" r="3" fill="white"/><circle cx="205" cy="83" r="2" fill="white"/><path d="M0 168 Q90 139 160 166 T320 156 V220 H0Z" fill="#435d53"/><ellipse cx="111" cy="161" rx="30" ry="30" fill="#db8a4f"/><path d="M91 143 L90 117 L111 134 M122 133 L141 111 L136 148" fill="#db8a4f"/><ellipse cx="202" cy="157" rx="27" ry="33" fill="#eee8df"/><path d="M178 126 Q146 91 173 109" fill="none" stroke="#eee8df" stroke-width="14"/><path d="M226 125 Q258 91 232 109" fill="none" stroke="#eee8df" stroke-width="14"/><path d="M131 126 Q152 107 168 126" fill="#fff0c8"/><path d="M167 128 Q153 150 137 138" fill="none" stroke="#fff0c8" stroke-width="4"/></svg><span class="panel-num">PANEL 04</span><span class="panel-caption">Two friends, one big sky</span></div>
           </div>
-          <div class="preview-foot"><div class="character-chip"><span class="fox">🦊</span><span>Meet your main character: <b>Milo</b></span></div><div class="preview-actions"><button class="ghost" id="refresh">↻ &nbsp;Try again</button><button class="ghost" id="download">↓ &nbsp;Download</button></div></div>
+          <div class="preview-foot"><div class="character-chip"><span class="fox">🦊</span><span>Meet your main character: <b>Milo</b></span></div><div class="preview-actions"><button class="ghost" id="refresh">↻ &nbsp;Try again</button><button class="ghost" id="download">↓ &nbsp;Download</button><button class="ghost" id="downloadJson">↓ &nbsp;Download storyboard (JSON)</button></div></div>
         </div>
       </section>
     </div>
   </main>
 </div>
+<dialog class="card library" id="library" aria-labelledby="libraryTitle"><div class="card-heading"><h2 id="libraryTitle">My stories</h2><button class="ghost" id="closeLibrary">Close</button></div><ol id="libraryList"></ol></dialog>
 <div class="toast" id="toast">Your local story studio is ready.</div>
 <script>
   const story=document.querySelector('#story'), counter=document.querySelector('#counter'), toast=document.querySelector('#toast');
   const update=()=>counter.textContent=`${story.value.length.toLocaleString()} / 1,000`;
   story.addEventListener('input',update);update();
-  let timer, lastResult=null;function message(text){toast.textContent=text;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>toast.classList.remove('show'),2600)}
+  let timer, lastResult=null, lastEntry=null;function message(text){toast.textContent=text;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>toast.classList.remove('show'),2600)}
   const canvas=document.querySelector('#canvas'), badge=document.querySelector('.badge');
   // Model output is only ever inserted with textContent, never innerHTML.
   function el(tag,cls,text){const node=document.createElement(tag);if(cls)node.className=cls;if(text!=null)node.textContent=text;return node}
@@ -131,15 +137,38 @@
       const response=await fetch('/api/comic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({story:story.value,count:parseInt(document.querySelector('#panels').value,10),style:document.querySelector('#style').value})});
       const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not make this comic.');
       lastResult=data;renderComic(data);
-      localStorage.setItem('draw-me-story-current',JSON.stringify({story:story.value,count:document.querySelector('#panels').value,style:document.querySelector('#style').value}));
-      document.querySelector('.save-status').innerHTML='<i class="save-dot"></i>STORY SAVED';message(data.warning?`Story panels are ready. ${data.warning}`:'Your story is now laid out in panels.');
+      lastEntry={story:story.value,count:document.querySelector('#panels').value,style:document.querySelector('#style').value,savedAt:Date.now(),result:data};
+      document.querySelector('.save-status').innerHTML=saveToLibrary(lastEntry)?'<i class="save-dot"></i>STORY SAVED':'<i class="save-dot"></i>NOT SAVED';message(data.warning?`Story panels are ready. ${data.warning}`:'Your story is now laid out in panels.');
     }catch(error){message(error.message)}finally{button.disabled=false;button.innerHTML='<span>✦</span> Make my comic';loading.classList.remove('show')}
   }
   document.querySelector('#generate').addEventListener('click',makeComic);
   document.querySelector('#refresh').addEventListener('click',makeComic);
   document.querySelector('#download').addEventListener('click',()=>{if(!lastResult){message('Make your comic first, then download it.');return}const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const names=castNames(lastResult);const html=`<!doctype html><meta charset="utf-8"><title>My comic</title><style>body{font:16px sans-serif;background:#f7f5ef;padding:24px}.panel{display:inline-flex;flex-direction:column;vertical-align:top;position:relative;width:42vw;height:280px;margin:8px;border:2px solid #20241f;background:#fbfaf5;overflow:hidden}.panel img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}.scene{padding:14px 14px 0;font-size:14px;color:#55584f}.scene b{display:block;color:#20241f}.says{position:relative;padding:8px 14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}.say{background:#fffefa;border:1.5px solid #20241f;border-radius:12px;padding:5px 10px;font-size:14px}.cap{position:absolute;bottom:10px;left:10px;right:10px;text-align:center;background:#fffefa;padding:8px 14px;border-radius:20px}</style><h1>${escape(lastResult.title||'My story comic')}</h1>${lastResult.panels.map(p=>`<div class="panel">${isImage(p.image)?`<img src="${escape(p.image)}" alt="${escape(p.scene)}">`:`<div class="scene"><b>${escape(p.setting)}</b>${p.mood?`<i>${escape(p.mood)}</i> · `:''}${escape(p.scene)}</div>`}<div class="says">${(p.dialogue||[]).map(d=>`<div class="say"><b>${escape(names[d.speaker_id]||d.speaker_id)}:</b> ${escape(d.text)}</div>`).join('')}</div><span class="cap">${escape(p.caption)}</span></div>`).join('')}`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='my-story-comic.html';a.click();URL.revokeObjectURL(a.href)});
   document.querySelector('#learnMore').addEventListener('click',()=>message('Write a story, choose a style, make panels, then download your comic.'));
-  document.querySelector('#libraryNav').addEventListener('click',()=>{const saved=JSON.parse(localStorage.getItem('draw-me-story-current')||'null');if(saved){story.value=saved.story;update();document.querySelector('#panels').value=saved.count;document.querySelector('#style').value=saved.style;message('Your latest saved story is loaded.')}else message('Your story library is empty. Make a comic to save your first story.')});
+  document.querySelector('#downloadJson').addEventListener('click',()=>{if(!lastEntry){message('Make your comic first, then download the storyboard.');return}const slug=(lastResult.title||'my-story').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'my-story';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({exported_at:new Date().toISOString(),story:lastEntry.story,panels:lastEntry.count,style:lastEntry.style,storyboard:lastResult},null,2)],{type:'application/json'}));a.download=`${slug}-storyboard.json`;a.click();URL.revokeObjectURL(a.href)});
+  // "My stories": the last 5 stories (with their results) in localStorage. Storage can be unavailable or full, so every access is guarded.
+  const LIBRARY_KEY='draw-me-story-library',LIBRARY_SIZE=5,library=document.querySelector('#library');
+  function readLibrary(){
+    try{const list=JSON.parse(localStorage.getItem(LIBRARY_KEY)||'[]');if(Array.isArray(list)&&list.length)return list.filter(e=>e&&typeof e.story==='string')}catch{}
+    try{const old=JSON.parse(localStorage.getItem('draw-me-story-current')||'null');if(old&&typeof old.story==='string')return[{...old,savedAt:null,result:null}]}catch{}
+    return[]}
+  const withoutImages=e=>e.result&&Array.isArray(e.result.panels)?{...e,result:{...e.result,panels:e.result.panels.map(({image,...p})=>p)}}:e;
+  function saveToLibrary(entry){
+    const list=[entry,...readLibrary().filter(e=>!(e.story===entry.story&&e.count===entry.count&&e.style===entry.style))].slice(0,LIBRARY_SIZE);
+    for(const attempt of[list,list.map(withoutImages)]){try{localStorage.setItem(LIBRARY_KEY,JSON.stringify(attempt));return true}catch{}}
+    return false}
+  function loadEntry(entry){
+    story.value=entry.story;update();document.querySelector('#panels').value=entry.count;document.querySelector('#style').value=entry.style;
+    if(entry.result&&Array.isArray(entry.result.panels)){lastEntry=entry;lastResult=entry.result;renderComic(entry.result);message('Your saved story and panels are loaded.')}
+    else message('Your saved story is loaded. Make the comic to see its panels.');
+    library.close()}
+  function openLibrary(){
+    const list=document.querySelector('#libraryList'),entries=readLibrary();list.replaceChildren();
+    if(!entries.length)list.append(el('li','empty','Your story library is empty. Make a comic to save your first story.'));
+    entries.forEach(entry=>{const item=el('button','story-item');item.append(el('b','',(entry.result&&entry.result.title)||(entry.story.slice(0,48)+(entry.story.length>48?'…':''))),el('small','',[entry.savedAt?new Date(entry.savedAt).toLocaleString():'Saved earlier',entry.count,entry.style].filter(Boolean).join(' · ')));item.addEventListener('click',()=>loadEntry(entry));const li=el('li');li.append(item);list.append(li)});
+    library.showModal()}
+  document.querySelector('#libraryNav').addEventListener('click',openLibrary);
+  document.querySelector('#closeLibrary').addEventListener('click',()=>library.close());
   document.querySelector('#inspireNav').addEventListener('click',()=>{story.value='A tiny paper boat drifted down a rain-filled street and discovered a secret garden where all the flowers glowed after dark.';update();message('A new story starter is ready to edit.')});
   document.querySelector('.help').addEventListener('click',()=>message('Write at least a sentence, choose panel count and style, then make your comic.'));
   story.addEventListener('input',()=>document.querySelector('.save-status').innerHTML='<i class="save-dot"></i>UNSAVED CHANGES');
