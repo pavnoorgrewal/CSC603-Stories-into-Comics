@@ -1,16 +1,13 @@
 # Draw Me a Story
 
-A Python and Streamlit prototype for turning a short story into illustrated comic panels. It has a local preview mode and can use OpenAI for story breakdown and image generation when an API key is configured.
+A Python localhost app for turning a short story into a comic layout. The visual frontend keeps its story-studio design while `server.py` connects to Gemini for panel planning and image generation.
 
 ## Run locally
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-streamlit run app.py
+python3 server.py
 ```
 
-To enable generated text and artwork, set `OPENAI_API_KEY` in your shell before starting Streamlit. Optional model overrides: `OPENAI_TEXT_MODEL` and `OPENAI_IMAGE_MODEL`.
+Open [http://localhost:8000](http://localhost:8000). No third-party packages are needed. The latest story is saved in browser storage. When Gemini image generation is unavailable, the app keeps the sample illustrations and displays the generated panel captions.
 
-Without a key, the app creates a local illustrated preview from the story text so the interface can be explored without making API requests.
+Set `GEMINI_API_KEY` in a local `.env` file or the server environment. `.env` is ignored by Git. The defaults are `gemini-3.5-flash` for the story plan and `gemini-3.1-flash-image` for illustrations; override them with `GEMINI_TEXT_MODEL` and `GEMINI_IMAGE_MODEL` if needed. Never place a secret key in `index.html` or commit it to GitHub.

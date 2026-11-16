@@ -14,7 +14,7 @@
     .shell{max-width:1440px;min-height:100vh;margin:auto;display:grid;grid-template-columns:244px 1fr;background:var(--paper)}
     aside{border-right:1px solid var(--line);padding:28px 18px;display:flex;flex-direction:column;min-height:100vh}
     .brand{display:flex;align-items:center;gap:11px;padding:0 10px 34px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.5px}
-    .brand-mark{width:34px;height:34px;background:var(--orange);border:1.5px solid var(--ink);border-radius:11px;display:grid;place-items:center;box-shadow:2px 2px 0 var(--ink);font-size:19px}
+    .brand-mark{width:38px;height:38px;flex:none;background:#fffefa;border:2px solid var(--ink);border-radius:11px;display:grid;place-items:center;box-shadow:3px 3px 0 var(--ink);transform:rotate(-4deg)}.brand-mark svg{width:30px;height:30px;display:block}
     .side-label{font:10px 'DM Mono',monospace;letter-spacing:.13em;color:#a09d91;padding:0 12px 10px;text-transform:uppercase}
     .nav{display:grid;gap:5px}.nav-item{border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:12px;font-size:13px;color:#686b62}.nav-item.active{background:#edeae1;color:var(--ink);font-weight:700}.nav-item .icon{font-size:17px;width:20px;text-align:center}
     .side-bottom{margin-top:auto}.pro-card{border:1px solid #e9d0be;border-radius:14px;padding:15px;background:#fff8f0;margin:20px 2px}.pro-card strong{font:600 13px 'Space Grotesk'}.pro-card p{font-size:11px;line-height:1.5;color:#797368;margin:6px 0 12px}.pro-card button{background:var(--ink);color:white;border:0;border-radius:8px;padding:9px 11px;font-size:11px;font-weight:700;width:100%}.profile{display:flex;gap:10px;align-items:center;border-top:1px solid var(--line);padding:18px 8px 0}.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#dce9c7;font-weight:700;font-size:12px}.profile b{font-size:12px}.profile small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
@@ -25,12 +25,24 @@
     .preview-foot{display:flex;align-items:center;justify-content:space-between;margin-top:15px}.character-chip{display:flex;align-items:center;gap:8px;color:#77796f;font-size:10px}.fox{width:24px;height:24px;border-radius:8px;background:#ffdfc7;display:grid;place-items:center;font-size:15px}.preview-actions{display:flex;gap:7px}.ghost{border:1px solid var(--line);background:white;border-radius:7px;padding:8px 10px;color:#5e6058;font-size:10px}.ghost:hover{background:#f6f4ee}.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,20px);background:#20241f;color:white;padding:12px 18px;border-radius:10px;font-size:12px;opacity:0;transition:.25s;pointer-events:none;box-shadow:var(--shadow)}.toast.show{opacity:1;transform:translate(-50%,0)}
     @media(max-width:1000px){.shell{grid-template-columns:205px 1fr}aside{padding:24px 12px}main{padding:0 25px 45px}.workspace{grid-template-columns:1fr}.input-card{min-height:450px}.preview-card{min-height:480px}}
     @media(max-width:680px){.shell{display:block}aside{display:none}main{padding:0 16px 35px}.topbar{height:60px}.hero{padding:30px 0 20px;display:block}.steps{margin-top:18px}.workspace{display:flex;flex-direction:column}.input-card{min-height:0;padding:17px}.preview-card{padding:17px;min-height:450px}.story-input{min-height:165px}.canvas{gap:7px;padding:7px}.panel,.art{min-height:130px}.preview-foot{gap:8px}.ghost{padding:7px}.save-status{font-size:8px}}
+    .brand{font-size:18px}.side-label,.eyebrow{font-size:12px}.nav-item{font-size:15px}
+    .pro-card strong{font-size:15px}.pro-card p,.pro-card button{font-size:13px}.profile b{font-size:14px}.profile small{font-size:12px}
+    .crumb,.help{font-size:14px}.save-status{font-size:11px}.hero p{font-size:16px}.steps{flex-wrap:wrap}.step{font-size:11px}
+    .card-heading h2,.preview-head h2{font-size:18px}.mini-tag{font-size:11px}.label{font-size:13px}.label small{font-size:12px}
+    .story-input{font-size:14px}.under-input{font-size:11px}.control label{font-size:12px}.select{font-size:13px}
+    .primary{font-size:14px}.preview-head p{font-size:12px}.badge{font-size:11px}
+    .panel-num{font-size:10px}.panel-caption{font-size:11px;line-height:1.25;white-space:normal;border-radius:9px;max-height:47px;overflow:hidden}
+    .character-chip,.ghost{font-size:12px}.toast{font-size:14px}
+    .loading{display:none;align-items:center;justify-content:center;gap:9px;margin:14px 0 0;color:#484b43;font-size:13px;font-weight:600}.loading.show{display:flex}
+    .spinner{width:17px;height:17px;border:2px solid #d7d6cc;border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    @media(prefers-reduced-motion:reduce){.spinner{animation:none;border-color:var(--ink)}}
+    @media(max-width:1000px){.hero{display:block}.steps{margin-top:18px}}
   </style>
 </head>
 <body>
 <div class="shell">
   <aside>
-    <a class="brand" href="#"><span class="brand-mark">✳</span> Draw Me a Story</a>
+    <a class="brand" href="#"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36" fill="none" stroke="#20241f" stroke-linecap="round" stroke-linejoin="round"><path d="M28 13C24 7 14 6 9 12c-5 6-1 15 6 17 9 2 17-7 12-15-4-6-13-7-17-1-3 5 0 11 6 12 6 1 11-5 8-10-2-4-8-4-10-1-2 3 0 7 4 7" stroke-width="2.7"/><path d="m6 5 2 3M29 28l3 3M30 7l-2 2" stroke-width="2"/></svg></span> Draw Me a Story</a>
     <div class="side-label">Workspace</div>
     <nav class="nav">
       <button class="nav-item active"><span class="icon">✦</span> Create a comic</button>
@@ -56,7 +68,7 @@
             <div class="control"><label for="panels">Number of panels</label><select class="select" id="panels"><option>4 panels</option><option>3 panels</option><option>5 panels</option><option>6 panels</option></select></div>
             <div class="control"><label for="style">Illustration style</label><select class="select" id="style"><option>Storybook color</option><option>Bold & graphic</option><option>Soft watercolor</option><option>Playful doodles</option></select></div>
           </div>
-          <div class="generate"><button class="primary" id="generate"><span>✦</span> Make my comic</button><p class="privacy">Your story stays yours. Make something lovely.</p></div>
+          <div class="generate"><button class="primary" id="generate"><span>✦</span> Make my comic</button><div class="loading" id="loading" role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span>working on your imagination</div></div>
         </div>
         <div class="card preview-card">
           <div class="preview-head"><div><h2>A little preview</h2><p>Your story is taking shape</p></div><span class="badge"><i></i> READY TO CREATE</span></div>
@@ -72,18 +84,37 @@
     </div>
   </main>
 </div>
-<div class="toast" id="toast">This is a design preview — comic generation is not connected yet.</div>
+<div class="toast" id="toast">Your local story studio is ready.</div>
 <script>
   const story=document.querySelector('#story'), counter=document.querySelector('#counter'), toast=document.querySelector('#toast');
   const update=()=>counter.textContent=`${story.value.length.toLocaleString()} / 1,000`;
   story.addEventListener('input',update);update();
-  let timer;function message(text){toast.textContent=text;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>toast.classList.remove('show'),2600)}
-  document.querySelector('#generate').addEventListener('click',()=>message('Lovely start! AI comic generation will be connected in the next step.'));
-  document.querySelector('#refresh').addEventListener('click',()=>message('Your preview is ready for a fresh take.'));
-  document.querySelector('#download').addEventListener('click',()=>message('Downloads will be available once comic creation is connected.'));
-  document.querySelector('#learnMore').addEventListener('click',()=>message('Write a story, choose a style, and watch it become a comic.'));
-  document.querySelector('#libraryNav').addEventListener('click',()=>message('Your story library is coming soon.'));
-  document.querySelector('#inspireNav').addEventListener('click',()=>message('Story prompts are coming soon.'));
+  let timer, lastPanels=[];function message(text){toast.textContent=text;toast.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>toast.classList.remove('show'),2600)}
+  const canvas=document.querySelector('#canvas'), badge=document.querySelector('.badge');
+  async function makeComic(){
+    const button=document.querySelector('#generate'),loading=document.querySelector('#loading');
+    button.disabled=true;button.innerHTML='<span>✦</span> Making your comic…';loading.classList.add('show');
+    try{
+      const response=await fetch('/api/comic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({story:story.value,count:parseInt(document.querySelector('#panels').value,10),style:document.querySelector('#style').value})});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not make this comic.');
+      lastPanels=data.panels;const cards=[...canvas.querySelectorAll('.panel')];
+      data.panels.forEach((panel,i)=>{let card=cards[i];if(!card){card=cards[0].cloneNode(true);canvas.appendChild(card)}card.querySelector('.panel-num').textContent=`PANEL ${String(i+1).padStart(2,'0')}`;card.querySelector('.panel-caption').textContent=panel.caption||'A new story moment';if(panel.image){const img=document.createElement('img');img.className='art';img.alt=panel.scene||'Comic panel';img.src=panel.image;card.querySelector('.art').replaceWith(img)}});
+      cards.slice(data.panels.length).forEach(card=>card.remove());
+      badge.innerHTML=data.mode==='gemini'?'<i></i> GEMINI COMIC READY':data.mode==='gemini-text-only'?'<i></i> STORY READY · IMAGE UNAVAILABLE':'<i></i> LOCAL STORY PREVIEW';
+      document.querySelector('.preview-head p').textContent='Your story is arranged into panels';
+      document.querySelector('.character-chip').innerHTML='<span class="fox">✦</span><span>Main character: <b></b></span>';document.querySelector('.character-chip b').textContent=data.main_character||'Your character';
+      localStorage.setItem('draw-me-story-current',JSON.stringify({story:story.value,count:document.querySelector('#panels').value,style:document.querySelector('#style').value}));
+      document.querySelector('.save-status').innerHTML='<i class="save-dot"></i>STORY SAVED';message(data.warning?'Story panels are ready. Gemini image generation is unavailable for this key right now.':'Your story is now laid out in panels.');
+    }catch(error){message(error.message)}finally{button.disabled=false;button.innerHTML='<span>✦</span> Make my comic';loading.classList.remove('show')}
+  }
+  document.querySelector('#generate').addEventListener('click',makeComic);
+  document.querySelector('#refresh').addEventListener('click',makeComic);
+  document.querySelector('#download').addEventListener('click',()=>{if(!lastPanels.length){message('Make your comic first, then download it.');return}const escape=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const html=`<!doctype html><meta charset="utf-8"><title>My comic</title><style>body{font:16px sans-serif;background:#f7f5ef;padding:24px}.panel{display:inline-flex;vertical-align:top;position:relative;width:42vw;height:240px;margin:8px;border:2px solid #20241f;background:#dce9c7;align-items:end;justify-content:center}.panel img{width:100%;height:100%;object-fit:cover}.cap{position:absolute;bottom:10px;background:#fffefa;padding:8px 14px;border-radius:20px}</style><h1>My story comic</h1>${[...canvas.querySelectorAll('.panel')].map(p=>`<div class="panel">${p.querySelector('.art').outerHTML}<span class="cap">${escape(p.querySelector('.panel-caption').textContent)}</span></div>`).join('')}`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='my-story-comic.html';a.click();URL.revokeObjectURL(a.href)});
+  document.querySelector('#learnMore').addEventListener('click',()=>message('Write a story, choose a style, make panels, then download your comic.'));
+  document.querySelector('#libraryNav').addEventListener('click',()=>{const saved=JSON.parse(localStorage.getItem('draw-me-story-current')||'null');if(saved){story.value=saved.story;update();document.querySelector('#panels').value=saved.count;document.querySelector('#style').value=saved.style;message('Your latest saved story is loaded.')}else message('Your story library is empty. Make a comic to save your first story.')});
+  document.querySelector('#inspireNav').addEventListener('click',()=>{story.value='A tiny paper boat drifted down a rain-filled street and discovered a secret garden where all the flowers glowed after dark.';update();message('A new story starter is ready to edit.')});
+  document.querySelector('.help').addEventListener('click',()=>message('Write at least a sentence, choose panel count and style, then make your comic.'));
+  story.addEventListener('input',()=>document.querySelector('.save-status').innerHTML='<i class="save-dot"></i>UNSAVED CHANGES');
 </script>
 </body>
 </html>
